@@ -1,0 +1,4 @@
+fastapi 
+httpx-cache
+slowapi
+uvicorn[standard]
