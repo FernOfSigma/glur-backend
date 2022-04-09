@@ -6,5 +6,5 @@ fastapi
 slowapi
 uvicorn[standard]
 
-# Optional speedup, uncomment to install.
-# orjson
+# Optional speedup, comment out if it fails to install.
+orjson
