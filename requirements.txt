@@ -1,4 +1,10 @@
-fastapi 
+# HTTP client.
 httpx-cache
+
+# API and server.
+fastapi 
 slowapi
 uvicorn[standard]
+
+# Optional speedup, uncomment to install.
+# orjson
