@@ -4,8 +4,12 @@ import os
 import warnings
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-from httpx import RequestError
+try:
+    from fastapi.responses import ORJSONResponse as JSONResponse
+except ModuleNotFoundError:
+    warnings.warn("'orjson' is not installed, using built-in JSON encoder")
+    from fastapi.responses import JSONResponse
+
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -34,15 +38,8 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 @app.get("/")
 @limiter.limit(DEFAULT_RATE)
 async def root(request: Request, owner: str, repo: str):
-    try:
-        response = await endpoint.request(owner, repo)
-    except RequestError as exc:
-        warnings.warn(exc.__doc__ or "Request failed") # Fallback message.
-    else:
-        return JSONResponse(
-            status_code=response.status_code,
-            content=response.json()
-        )
+    resp = await endpoint.request(owner, repo)
+    return JSONResponse(status_code=resp.status_code, content=resp.json())
 
 # Properly close on shutdown.
 @app.on_event("shutdown")
