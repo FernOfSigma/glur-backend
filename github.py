@@ -10,19 +10,10 @@ __all__ = ["Endpoint"]
 ROOT = "https://api.github.com/"
 
 # HTTP Methods supported by `httpx`.
-METHODS = (
-    "GET",
-    "OPTIONS", 
-    "HEAD",
-    "POST",
-    "PUT",
-    "PATCH",
-    "DELETE"
-)
+METHODS = ("GET", "OPTIONS", "HEAD", "POST", "PUT", "PATCH", "DELETE")
 
 
 class InvalidMethod(Exception):
-
     def __init__(self, method, *args):
         super().__init__(*args)
         self.method = method
@@ -43,7 +34,7 @@ class Endpoint:
         headers = {
             # Set default cache expiration time to 1h.
             "Cache-Control": "max-age=3600",
-            "User-Agent": "gru/0.0.1"
+            "User-Agent": "gru/0.0.1",
         }
         # Add the API token to `headers`.
         if api_token is not None:
@@ -52,7 +43,7 @@ class Endpoint:
             warnings.warn("Setting a GitHub API token is recommended")
         # Create `AsyncClient` instance to reuse the connection.
         self._client = AsyncClient(headers=headers)
-        
+
         if method not in METHODS:
             raise InvalidMethod(method)
         else:
