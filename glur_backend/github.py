@@ -1,8 +1,10 @@
 """A tiny module for calling the GitHub REST API."""
 
+from typing import Any, Optional
 import warnings
 
-from httpx_cache import AsyncClient
+from httpx import Response
+from httpx_cache import AsyncClient  # type: ignore
 
 from .constants import ROOT, METHODS
 from .errors import InvalidMethodError
@@ -11,7 +13,9 @@ from .errors import InvalidMethodError
 class Endpoint:
     """Represents a GitHub API endpoint for ease of use."""
 
-    def __init__(self, method, endpoint, api_token=None):
+    def __init__(
+        self, method: str, endpoint: str, api_token: Optional[str] = None
+    ) -> None:
         headers = {
             # Set default cache expiration time to 1h.
             "Cache-Control": "max-age=3600",
@@ -34,15 +38,15 @@ class Endpoint:
         self._endpoint = endpoint.lstrip("/")
 
     @property
-    def api_token_is_set(self):
+    def api_token_is_set(self) -> bool:
         """Indicates if the a GitHub API token has been set."""
         return self._client.headers.get("Authorization") is None
 
-    async def request(self, *args, **kwargs):
+    async def request(self, *args: str, **kwargs: Any) -> Response:
         """Sends a request to the GitHub API endpoint."""
         url = ROOT + self._endpoint.format(*args)
         return await self._client.request(self._method, url, **kwargs)
 
-    async def close(self):
+    async def close(self) -> None:
         """Close the underlying `AsyncClient` instance."""
         await self._client.aclose()

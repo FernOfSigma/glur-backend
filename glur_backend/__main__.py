@@ -1,13 +1,7 @@
 """Server script."""
 
-import warnings
-
 from fastapi import FastAPI, Request
-try:
-    from fastapi.responses import ORJSONResponse as JSONResponse
-except ModuleNotFoundError:
-    warnings.warn("'orjson' is not installed, using built-in JSON encoder")
-    from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse
 
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -32,15 +26,16 @@ limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+
 # `request` needs to be an argument for `slowapi` to work.
 @app.get("/")
 @limiter.limit(DEFAULT_RATE)
-async def root(request: Request, owner: str, repo: str):
+async def root(request: Request, owner: str, repo: str) -> JSONResponse:
     resp = await endpoint.request(owner, repo)
     return JSONResponse(status_code=resp.status_code, content=resp.json())
 
 
 # Properly close on shutdown.
 @app.on_event("shutdown")
-async def shutdown_handler():
+async def shutdown_handler() -> None:
     await endpoint.close()

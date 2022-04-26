@@ -1,10 +1,4 @@
-# HTTP client.
 httpx-cache
-
-# API and server.
 fastapi 
 slowapi
 uvicorn[standard]
-
-# Optional speedup, comment out if it fails to install.
-orjson
